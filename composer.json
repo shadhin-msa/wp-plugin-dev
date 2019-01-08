@@ -1,0 +1,15 @@
+{
+    "name": "shadhin/mft",
+    "description": "Plugin for custom family member post and family tree",
+    "type": "plugin",
+    "authors": [
+        {
+            "name": "Md. Shahinur Alam",
+            "email": "shadhinmsa@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {"Inc\\": "inc/"}
+    }
+}
