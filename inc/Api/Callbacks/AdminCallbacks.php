@@ -22,9 +22,9 @@ class AdminCallbacks extends BaseController
         return require_once("$this->plugin_path/templates/cpt.php");
     }
     
-    public function adminWidgets()
+    public function adminGallery()
     {
-        return require_once("$this->plugin_path/templates/widget.php");
+        return require_once("$this->plugin_path/templates/gallery.php");
     }
     
     public function adminTaxonomies()
@@ -32,28 +32,28 @@ class AdminCallbacks extends BaseController
         return require_once("$this->plugin_path/templates/taxonomies.php");
     }
     
-    public function mftOptionGroup($input)
-    {
-        //validate the input
-        return $input;
-    }
+    // public function mftOptionGroup($input)
+    // {
+    //     //validate the input
+    //     return $input;
+    // }
     
-    public function mftAdminSection()
-    {
-        echo "Nice settins section";
-    }
+    // public function mftAdminSection()
+    // {
+    //     echo "Nice settins section";
+    // }
      
-    public function mftTextExample()
-    {
-        //value after submit
-        $value=esc_attr( get_option( 'text_example' ) ); 
-        echo '<input type=""  class="regular-text" name="text_example" value="'.$value.'" placeholder="write something here" >';
-    }
+    // public function mftTextExample()
+    // {
+    //     //value after submit
+    //     $value=esc_attr( get_option( 'text_example' ) ); 
+    //     echo '<input type=""  class="regular-text" name="text_example" value="'.$value.'" placeholder="write something here" >';
+    // }
     
-    public function mftFirstName()
-    {
-        //value after submit
-        $value=esc_attr( get_option( 'first_name' ) ); 
-        echo '<input type=""  class="regular-text" name="first_name" value="'.$value.'" placeholder="write something here" >';
-    }
+    // public function mftFirstName()
+    // {
+    //     //value after submit
+    //     $value=esc_attr( get_option( 'first_name' ) ); 
+    //     echo '<input type=""  class="regular-text" name="first_name" value="'.$value.'" placeholder="write something here" >';
+    // }
 }
