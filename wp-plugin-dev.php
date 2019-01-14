@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Milgrom Family Tree
-Plugin URI: https://milgromfamilytree.com
-Description: Plugin for custom user post and family tree
+Plugin Name: WP Plugin Development
+Plugin URI: https://www.linkedin.com/in/shadhin-msa/
+Description: Plugin for custom user post, taxonomy, gallery manager etc
 Version: 0.1.0
 Author: Md. Shahinur Alam
 Author URI: https://www.linkedin.com/in/shadhin-msa/

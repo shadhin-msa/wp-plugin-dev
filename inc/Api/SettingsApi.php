@@ -118,10 +118,14 @@ class SettingsApi
 
         //add fields in section
         foreach ($this->fields as $field) {
+            
             add_settings_field($field['id'], $field['title'],
                 (isset($field['callback'])) ? $field['callback'] : '', $field['page'], $field['section'],
                 (isset($field['args'])) ? $field['args'] : '');
+                
+                // echo '<pre>' . var_export($field, true) . '</pre>';;
         }
+           
     }
 
 }

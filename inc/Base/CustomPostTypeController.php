@@ -3,6 +3,7 @@
 namespace Inc\Base;
 
 use Inc\Api\Callbacks\AdminCallbacks;
+use Inc\Api\Callbacks\CptCallbacks;
 use Inc\Api\SettingsApi;
 use Inc\Base\BaseController;
 
@@ -12,7 +13,11 @@ class CustomPostTypeController extends BaseController
 
     public $subpages;
 
+    public $fields;
+
     public $adminCallbacks;
+
+    public $cptCallbacks;
 
     public $custom_post_types = [];
 
@@ -26,15 +31,139 @@ class CustomPostTypeController extends BaseController
 
         $this->adminCallbacks = new AdminCallbacks();
 
+        $this->cptCallbacks = new cptCallbacks();
+
         $this->setSubpages();
+
+        $this->setSettings();
+
+        $this->setSection();
+
+        $this->setFields();
 
         $this->settings_api->addSubpages($this->subpages)->register();
 
         $this->addPostType();
-        
-        if(!empty($this->custom_post_types)){
+
+        if (!empty($this->custom_post_types)) {
             add_action('init', [$this, 'registerPostTypes']);
         }
+    }
+
+    public function setSubpages()
+    {
+        $this->subpages = [
+            [
+                'parent_slug' => 'mft_settings',
+                'page_title' => 'Custom Post Types',
+                'menu_title' => 'CPT Manager',
+                'capability' => 'manage_options',
+                'menu_slug' => 'wppd_cpt_manager',
+                'callback' => [$this->adminCallbacks, 'adminCPT'],
+            ],
+        ];
+    }
+
+    //set settings
+
+    public function setSettings()
+    {
+        $args = [
+            [
+                'option_group' => 'wppd_cpt_settings_group',
+                'option_name' => 'wppd_cpt',
+                'callback' => [$this->cptCallbacks, 'cptSanitizer'],
+            ],
+        ];
+
+        $this->settings_api->setSettings($args);
+    }
+
+    //set section
+    public function setSection()
+    {
+        $args = [
+            [
+                'id' => 'wppd_cpt_index',
+                'title' => 'Custom Post Type Manager',
+                'callback' => [$this->cptCallbacks, 'cptSection'],
+                'page' => 'wppd_cpt_manager',
+            ],
+        ];
+
+        $this->settings_api->setSections($args);
+    }
+
+    //set fields
+
+    public function setFields()
+    {
+        $args =
+            [
+            [
+                'id' => 'post_type',
+                'title' => 'Post Type',
+                'callback' => [$this->cptCallbacks, 'textboxField'],
+                'page' => 'wppd_cpt_manager',
+                'section' => 'wppd_cpt_index',
+                'args' => [
+                    'option_name' => 'wppd_cpt',
+                    'label_for' => 'post_type',
+                    'placeholder' => 'eg. family_member',
+                ],
+            ],
+            [
+                'id' => 'single_name',
+                'title' => 'Single Name',
+                'callback' => [$this->cptCallbacks, 'textboxField'],
+                'page' => 'wppd_cpt_manager',
+                'section' => 'wppd_cpt_index',
+                'args' => [
+                    'option_name' => 'wppd_cpt',
+                    'label_for' => 'single_name',
+                    'placeholder' => 'eg. Family member',
+                ],
+            ],
+            [
+                'id' => 'plural_name',
+                'title' => 'Plural Name',
+                'callback' => [$this->cptCallbacks, 'textboxField'],
+                'page' => 'wppd_cpt_manager',
+                'section' => 'wppd_cpt_index',
+                'args' => [
+                    'option_name' => 'wppd_cpt',
+                    'label_for' => 'plural_name',
+                    'placeholder' => 'eg. Family members',
+                ],
+            ],
+            [
+                'id' => 'public',
+                'title' => 'Public',
+                'callback' => [$this->cptCallbacks, 'checkboxField'],
+                'page' => 'wppd_cpt_manager',
+                'section' => 'wppd_cpt_index',
+                'args' => [
+                    'option_name' => 'wppd_cpt',
+                    'label_for' => 'public',
+                    'classes' => 'ui-toggle',
+                ],
+            ],
+            [
+                'id' => 'has_archive',
+                'title' => 'Has Archive',
+                'callback' => [$this->cptCallbacks, 'checkboxField'],
+                'page' => 'wppd_cpt_manager',
+                'section' => 'wppd_cpt_index',
+                'args' => [
+                    'option_name' => 'wppd_cpt',
+                    'label_for' => 'has_archive',
+                    'classes' => 'ui-toggle',
+                ],
+            ],
+        ];
+
+        //    var_dump($args);
+        $this->settings_api->setFields($args);
     }
 
     public function addPostType()
@@ -107,75 +236,59 @@ class CustomPostTypeController extends BaseController
         }
     }
 
-    public function registerPostTypes(){
-
-        
-		foreach ($this->custom_post_types as $post_type) {
-			register_post_type( $post_type['post_type'],
-				array(
-					'labels' => array(
-						'name'                  => $post_type['name'],
-						'singular_name'         => $post_type['singular_name'],
-						'menu_name'             => $post_type['menu_name'],
-						'name_admin_bar'        => $post_type['name_admin_bar'],
-						'archives'              => $post_type['archives'],
-						'attributes'            => $post_type['attributes'],
-						'parent_item_colon'     => $post_type['parent_item_colon'],
-						'all_items'             => $post_type['all_items'],
-						'add_new_item'          => $post_type['add_new_item'],
-						'add_new'               => $post_type['add_new'],
-						'new_item'              => $post_type['new_item'],
-						'edit_item'             => $post_type['edit_item'],
-						'update_item'           => $post_type['update_item'],
-						'view_item'             => $post_type['view_item'],
-						'view_items'            => $post_type['view_items'],
-						'search_items'          => $post_type['search_items'],
-						'not_found'             => $post_type['not_found'],
-						'not_found_in_trash'    => $post_type['not_found_in_trash'],
-						'featured_image'        => $post_type['featured_image'],
-						'set_featured_image'    => $post_type['set_featured_image'],
-						'remove_featured_image' => $post_type['remove_featured_image'],
-						'use_featured_image'    => $post_type['use_featured_image'],
-						'insert_into_item'      => $post_type['insert_into_item'],
-						'uploaded_to_this_item' => $post_type['uploaded_to_this_item'],
-						'items_list'            => $post_type['items_list'],
-						'items_list_navigation' => $post_type['items_list_navigation'],
-						'filter_items_list'     => $post_type['filter_items_list']
-					),
-					'label'                     => $post_type['label'],
-					'description'               => $post_type['description'],
-					'supports'                  => $post_type['supports'],
-					'taxonomies'                => $post_type['taxonomies'],
-					'hierarchical'              => $post_type['hierarchical'],
-					'public'                    => $post_type['public'],
-					'show_ui'                   => $post_type['show_ui'],
-					'show_in_menu'              => $post_type['show_in_menu'],
-					'menu_position'             => $post_type['menu_position'],
-					'show_in_admin_bar'         => $post_type['show_in_admin_bar'],
-					'show_in_nav_menus'         => $post_type['show_in_nav_menus'],
-					'can_export'                => $post_type['can_export'],
-					'has_archive'               => $post_type['has_archive'],
-					'exclude_from_search'       => $post_type['exclude_from_search'],
-					'publicly_queryable'        => $post_type['publicly_queryable'],
-					'capability_type'           => $post_type['capability_type']
-				)
-			);
-		}
-    }
-
-    public function setSubpages()
+    public function registerPostTypes()
     {
-
-        $this->subpages = [
-            [
-                'parent_slug' => 'mft_settings',
-                'page_title' => 'Custom Post Types',
-                'menu_title' => 'CPT Manager',
-                'capability' => 'manage_options',
-                'menu_slug' => 'mft_cpt_manager',
-                'callback' => [$this->adminCallbacks, 'adminCPT'],
-            ],
-        ];
+        foreach ($this->custom_post_types as $post_type) {
+            register_post_type($post_type['post_type'],
+                array(
+                    'labels' => array(
+                        'name' => $post_type['name'],
+                        'singular_name' => $post_type['singular_name'],
+                        'menu_name' => $post_type['menu_name'],
+                        'name_admin_bar' => $post_type['name_admin_bar'],
+                        'archives' => $post_type['archives'],
+                        'attributes' => $post_type['attributes'],
+                        'parent_item_colon' => $post_type['parent_item_colon'],
+                        'all_items' => $post_type['all_items'],
+                        'add_new_item' => $post_type['add_new_item'],
+                        'add_new' => $post_type['add_new'],
+                        'new_item' => $post_type['new_item'],
+                        'edit_item' => $post_type['edit_item'],
+                        'update_item' => $post_type['update_item'],
+                        'view_item' => $post_type['view_item'],
+                        'view_items' => $post_type['view_items'],
+                        'search_items' => $post_type['search_items'],
+                        'not_found' => $post_type['not_found'],
+                        'not_found_in_trash' => $post_type['not_found_in_trash'],
+                        'featured_image' => $post_type['featured_image'],
+                        'set_featured_image' => $post_type['set_featured_image'],
+                        'remove_featured_image' => $post_type['remove_featured_image'],
+                        'use_featured_image' => $post_type['use_featured_image'],
+                        'insert_into_item' => $post_type['insert_into_item'],
+                        'uploaded_to_this_item' => $post_type['uploaded_to_this_item'],
+                        'items_list' => $post_type['items_list'],
+                        'items_list_navigation' => $post_type['items_list_navigation'],
+                        'filter_items_list' => $post_type['filter_items_list'],
+                    ),
+                    'label' => $post_type['label'],
+                    'description' => $post_type['description'],
+                    'supports' => $post_type['supports'],
+                    'taxonomies' => $post_type['taxonomies'],
+                    'hierarchical' => $post_type['hierarchical'],
+                    'public' => $post_type['public'],
+                    'show_ui' => $post_type['show_ui'],
+                    'show_in_menu' => $post_type['show_in_menu'],
+                    'menu_position' => $post_type['menu_position'],
+                    'show_in_admin_bar' => $post_type['show_in_admin_bar'],
+                    'show_in_nav_menus' => $post_type['show_in_nav_menus'],
+                    'can_export' => $post_type['can_export'],
+                    'has_archive' => $post_type['has_archive'],
+                    'exclude_from_search' => $post_type['exclude_from_search'],
+                    'publicly_queryable' => $post_type['publicly_queryable'],
+                    'capability_type' => $post_type['capability_type'],
+                )
+            );
+        }
     }
 
 }

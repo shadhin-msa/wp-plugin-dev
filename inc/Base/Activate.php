@@ -6,12 +6,17 @@ class Activate{
     public static function activate(){
         flush_rewrite_rules();
 
-        if(get_option('mft_plugin')){
-            return;
-        }
+        self::setDefaultOptionData('mft_plugin');
+        self::setDefaultOptionData('wppd_cpt');
+
         
-        $default = [];
-        update_option('mft_plugin', $default);
+    }
+    public static function setDefaultOptionData( String $option_name)
+    {
+        if(!get_option($option_name)){
+            
+            update_option($option_name, []);
+        }
     }
 }
 

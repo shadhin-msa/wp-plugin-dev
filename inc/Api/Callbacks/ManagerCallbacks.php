@@ -17,7 +17,7 @@ class ManagerCallbacks extends BaseController
 
         foreach ($this->manager as $key => $value) 
         {        
-            $output[$key] =  (isset($input[$key])) ? ($input[$key])?true:false : false ; 
+            $output[$key] =  ( isset($input[$key]) ) ? ( $input[$key] )?true:false : false ; 
         }
         return $output;
     }
